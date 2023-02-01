@@ -1,6 +1,6 @@
 # Lambda Players - CSS Weapon Pack
  
-Adds 26 new weapons from Counter-Strike: Source to [Lambda Players](https://github.com/IcyStarFrost/Lambda-Players)' equipment, with each one of them re-balanced for enjoyable combat experiance. Counter-Strike: Source is not required to be mounted, as all assets are already built-in in Garry's Mod.
+Adds 26 new weapons from Counter-Strike: Source to [Lambda Players](https://github.com/IcyStarFrost/Lambda-Players)' equipment, with each one of them re-balanced for enjoyable combat experience. Counter-Strike: Source is not required to be mounted, as all assets are already built-in in Garry's Mod.
 
 ![poster-23-02-02 00-43-05](https://user-images.githubusercontent.com/87763830/216134252-5b5bad47-f7b5-489a-8507-05a43544d7cb.png)
 
