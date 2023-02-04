@@ -32,6 +32,8 @@ local ipairs = ipairs
 local ents_FindInSphere =  ents.FindInSphere
 local ignorePlys = GetConVar( "ai_ignoreplayers" )
 
+local ignoreThrower = CreateLambdaConvar( "lambdaplayers_weapons_flashbang_ignorethrower", 1, true, false, false, "If thrown flashbang shouldn't blind its Lambda thrower", 0, 1, { type = "Bool", name = "CSS Flashbang - Don't Flash Thrower", category = "Weapon Utilities" } )
+
 local flashColor = Color( 255, 255, 255 )
 local angularVel = Vector( 600, 0, 0 )
 local bounceSnds = {
@@ -59,7 +61,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             if !IsValid( grenade ) then return true end
 
             local srcPos = wepent:GetPos()
-            self.l_WeaponUseCooldown = CurTime() + random( 3.0, 6.0 )
+            self.l_WeaponUseCooldown = CurTime() + random( 4.0, 8.0 )
 
             self:RemoveGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_GRENADE )
             self:AddGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_GRENADE, true )
@@ -105,7 +107,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                 local grenPos = grenade:GetPos()
                 for _, v in ipairs( ents_FindInSphere( grenPos, 1500 ) ) do
                     if !LambdaIsValid( v ) or !v.IsLambdaPlayer and ( !v:IsPlayer() or !v:Alive() or ignorePlys:GetBool() ) or !v:VisibleVec( grenPos ) then continue end
-                    if IsValid( owner ) and !owner:CanTarget( v ) then continue end
+                    if IsValid( owner ) and ( v == owner and ignoreThrower:GetBool() or !owner:CanTarget( v ) ) then continue end
 
                     local eyePos = ( v.IsLambdaPlayer and v:GetAttachmentPoint( "eyes" ).Pos or v:EyePos() )                            
                     local adjustedDamage = ( 4 - ( eyePos:Distance( grenPos ) * ( 4 / 1500 ) ) )
