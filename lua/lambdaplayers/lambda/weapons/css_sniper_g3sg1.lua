@@ -1,3 +1,6 @@
+local callbackTbl = { cooldown = true }
+local Rand = math.Rand
+
 table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_sniper_g3sg1 = {
 		model = "models/weapons/w_snip_g3sg1.mdl",
@@ -10,11 +13,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         islethal = true,
 		keepdistance = 1500,
 		attackrange = 3000,
+        speedmultiplier = 0.84,
 
 		clip = 20,
-        damage = 32,
-        spread = 0.085,
-        rateoffire = 0.45,
+        damage = 45,
+        spread = 0.1,
         tracername = "Tracer",
         muzzleflash = 1,
         shelleject = "RifleShellEject",
@@ -31,6 +34,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 1.8, "Weapon_G3SG1.Clipin" },
             { 2.9, "Weapon_G3SG1.Clipout" },
             { 3.9, "Weapon_G3SG1.Slide" }
-        }
+        },
+
+        callback = function( self, wepent )
+            self.l_WeaponUseCooldown = CurTime() + Rand( 0.33, 0.5 )
+            return callbackTbl
+        end
 	}
 } )

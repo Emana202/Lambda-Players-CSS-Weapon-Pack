@@ -1,7 +1,7 @@
 local random = math.random
 local silencedCallbackTbl = { damage = true, muzzleflash = true, sound = true }
 local silencedbulletTbl = {
-    Damage = 12,
+    Damage = 10,
     Force = 12,
     Spread = Vector( 0.075, 0.075, 0 ),
     HullSize = 5,
@@ -22,7 +22,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 		attackrange = 1500,
 
 		clip = 12,
-        damage = 13,
+        damage = 11,
         spread = 0.1,
         rateoffire = 0.2,
         tracername = "Tracer",

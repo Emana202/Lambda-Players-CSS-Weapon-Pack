@@ -10,6 +10,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         islethal = true,
 		keepdistance = 500,
 		attackrange = 2000,
+        speedmultiplier = 0.86,
 
 		clip = 35,
         damage = 8,

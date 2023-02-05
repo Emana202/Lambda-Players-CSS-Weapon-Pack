@@ -1,8 +1,8 @@
 local random = math.random
 local Rand = math.Rand
 local bulletTbl = {
-    Damage = 13,
-    Force = 13,
+    Damage = 11,
+    Force = 11,
     HullSize = 5,
     Spread = Vector( 0.075, 0.075, 0 ),
     TracerName = "Tracer"
@@ -24,7 +24,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 		attackrange = 1500,
 
 		clip = 20,
-        damage = 11,
+        damage = 9,
         spread = 0.09,
         rateoffire = 0.17,
         tracername = "Tracer",

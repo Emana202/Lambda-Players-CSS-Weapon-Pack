@@ -12,7 +12,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 		attackrange = 1500,
 
 		clip = 20,
-        damage = 14,
+        damage = 12,
         spread = 0.125,
         rateoffire = 0.18,
         tracername = "Tracer",

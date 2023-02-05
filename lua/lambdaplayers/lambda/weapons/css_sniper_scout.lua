@@ -1,5 +1,7 @@
 local shelloffpos = Vector( 10, 0, 3 )
 local shelloffang = Angle( 0, -90, 0 )
+local callbackTbl = { cooldown = true }
+local Rand = math.Rand
 
 table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_sniper_scout = {
@@ -13,11 +15,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         islethal = true,
 		keepdistance = 1500,
 		attackrange = 3000,
+        speedmultiplier = 1.04,
 
 		clip = 10,
         damage = 65,
-        spread = 0.06,
-        rateoffire = 1.8,
+        spread = 0.075,
         tracername = "Tracer",
         muzzleflash = 1,
         shelleject = false,
@@ -34,10 +36,14 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         },
 
         callback = function( self, wepent )
+            self.l_WeaponUseCooldown = CurTime() + Rand( 1.5, 2.5 )
+
             self:SimpleTimer( 0.5, function() 
                 wepent:EmitSound( "Weapon_Scout.Bolt" )
                 self:HandleShellEject( "RifleShellEject", shelloffpos, shelloffang ) 
             end )
+
+            return callbackTbl
         end
 	}
 } )
