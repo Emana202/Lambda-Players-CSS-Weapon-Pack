@@ -63,6 +63,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         	wepent:FireBullets( silencedbulletTbl )
         	
         	return silencedCallbackTbl
+        end,
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 15 then return true end
         end
 	}
 } )

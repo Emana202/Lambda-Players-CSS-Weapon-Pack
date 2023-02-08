@@ -38,6 +38,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         callback = function( self, wepent )
             self.l_WeaponUseCooldown = CurTime() + Rand( 0.33, 0.5 )
             return callbackTbl
+        end,
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 5 then return true end
         end
 	}
 } )

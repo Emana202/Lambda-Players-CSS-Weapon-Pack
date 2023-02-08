@@ -48,6 +48,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             end )
 
             return callbackTbl
+        end,
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 2 then return true end
         end
 	}
 } )

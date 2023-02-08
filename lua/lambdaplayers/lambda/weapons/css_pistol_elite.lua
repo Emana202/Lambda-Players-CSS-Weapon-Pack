@@ -36,6 +36,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         end,
 
         OnReload = function( self, wepent )
+            if self.l_Clip > 0 then return true end
             local animID = self:LookupSequence( "reload_dual_base_layer" )
             local reloadLayer = ( animID != -1 and self:AddGestureSequence( animID ) or self:AddGesture( ACT_HL2MP_GESTURE_RELOAD_DUEL ) )
         end,

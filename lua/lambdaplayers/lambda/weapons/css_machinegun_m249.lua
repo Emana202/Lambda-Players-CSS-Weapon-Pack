@@ -1,8 +1,3 @@
-local function OnM249Reload( self )
-    if self:GetWeaponName() == "css_machinegun_m249" and self.l_Clip > 0 then return end
-    self:OldReloadWeapon()
-end
-
 table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_machinegun_m249 = {
 		model = "models/weapons/w_mach_m249para.mdl",
@@ -41,14 +36,8 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 4.5, "Weapon_M249.Coverdown" }
         },
 
-        OnEquip = function( self, wepent )
-            self.OldReloadWeapon = self.ReloadWeapon
-            self.ReloadWeapon = OnM249Reload
-        end,
-
-        OnUnequip = function( self, wepent )
-            self.ReloadWeapon = self.OldReloadWeapon
-            self.OldReloadWeapon = nil
+        OnReload = function( self, wepent )
+            if self.l_Clip > 0 then return true end
         end
 	}
 } )

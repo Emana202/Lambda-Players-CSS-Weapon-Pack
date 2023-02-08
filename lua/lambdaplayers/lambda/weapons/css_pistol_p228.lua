@@ -35,6 +35,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 
         OnEquip = function( self, wepent )
             wepent:EmitSound( "Weapon_P228.Slidepull" )
+        end,
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 5 then return true end
         end
 	}
 } )

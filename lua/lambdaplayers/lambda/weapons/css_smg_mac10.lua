@@ -30,6 +30,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 0.6, "Weapon_MAC10.Clipout" },
             { 1.6, "Weapon_MAC10.Clipin" },
             { 2.5, "Weapon_MAC10.Boltpull" }
-        }
+        },
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 15 then return true end
+        end
 	}
 } )

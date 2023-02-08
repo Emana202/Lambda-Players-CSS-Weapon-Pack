@@ -133,25 +133,23 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                         fadeTime = fadeTime * 1.75
                         if fadeTime < 1.0 then continue end
 
-                        local eneMemory = ( v:InCombat() and v:GetEnemy() or owner )
                         v:AddGesture( ACT_HL2MP_FIST_BLOCK, false )
+
+                        local eneMemory = ( v:InCombat() and v:GetEnemy() or owner )
                         v:SimpleTimer( fadeTime, function() 
                             v:RemoveGesture( ACT_HL2MP_FIST_BLOCK )
-                            if v:GetState() != "RetreatFromCombat" then return end
+                            if !v:IsPanicking() then return end
                             
-                            if LambdaIsValid( eneMemory ) and eneMemory != v then
-                                v:AttackTarget( eneMemory )
-                            else
-                                v:SetState( "Idle" )
-                                v:CancelMovement()
-                            end
+                            v:CancelMovement()
+
+                            if eneMemory == v or !LambdaIsValid( eneMemory ) then return end
+                            v:AttackTarget( eneMemory, true )
                         end, true )
 
                         v:CancelMovement()
                         v:SetEnemy( NULL )
-                        v.l_retreatendtime = CurTime() + fadeTime + 1
-                        v.l_RetreatTarget = eneMemory
-                        v:SetState( "RetreatFromCombat" )
+                        
+                        v:RetreatFrom( nil, fadeTime )
                     elseif v:IsPlayer() then
                         local startingAlpha = ( ( dotProduct < 0.5 or dotProduct < -0.5 ) and 200 or 255 )
                         flashColor.a = startingAlpha

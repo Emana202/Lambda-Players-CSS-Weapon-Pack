@@ -29,6 +29,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         reloadsounds = { 
             { 0.5, "Weapon_TMP.Clipout" },
             { 1.3, "Weapon_TMP.Clipin" }
-        }
+        },
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 15 then return true end
+        end
 	}
 } )

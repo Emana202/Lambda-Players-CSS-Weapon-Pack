@@ -34,6 +34,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 
         OnEquip = function( self, wepent )
             wepent:EmitSound( "Weapon_DEagle.Deploy" )
+        end,
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 4 then return true end
         end
 	}
 } )

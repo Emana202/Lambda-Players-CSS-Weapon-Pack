@@ -70,6 +70,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             self.l_WeaponSpeedMultiplier = ( wepent.IsScopedIn and 0.705 or 0.94 )
 
             return Rand( 0.25, 0.5 )
+        end,
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 15 then return true end
         end
 	}
 } )

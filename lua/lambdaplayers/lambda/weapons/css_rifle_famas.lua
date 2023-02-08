@@ -76,6 +76,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             end )
 
             return true
+        end,
+
+        OnReload = function( self, wepent )
+            if self.l_Clip > 10 then return true end
         end
 	}
 } )
