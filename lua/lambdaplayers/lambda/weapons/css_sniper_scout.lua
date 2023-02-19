@@ -3,6 +3,15 @@ local shelloffang = Angle( 0, -90, 0 )
 local callbackTbl = { cooldown = true }
 local Rand = math.Rand
 
+local scopedCallbackTbl = { damage = true, cooldown = true }
+local scopedBullet = {
+    Damage = 65,
+    Force = 65,
+    Spread = Vector( 0.15, 0.15, 0 ),
+    TracerName = "Tracer",
+    HullSize = 5
+}
+
 table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_sniper_scout = {
 		model = "models/weapons/w_snip_scout.mdl",
@@ -19,7 +28,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 
 		clip = 10,
         damage = 65,
-        spread = 0.075,
+        spread = 0.05,
         tracername = "Tracer",
         muzzleflash = 1,
         shelleject = false,
@@ -35,19 +44,47 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 2.1, "Weapon_Scout.Bolt" }
         },
 
-        callback = function( self, wepent )
-            self.l_WeaponUseCooldown = CurTime() + Rand( 1.5, 2.5 )
+        OnEquip = function( self, wepent )
+            wepent.IsScopedIn = false
+        end,
+
+        callback = function( self, wepent, target )
+            local scopedIn = wepent.IsScopedIn
+            self.l_WeaponUseCooldown = CurTime() + ( scopedIn and Rand( 2.5, 3.5 ) or Rand( 1.25, 1.66 ) )
 
             self:SimpleTimer( 0.5, function() 
                 wepent:EmitSound( "Weapon_Scout.Bolt" )
                 self:HandleShellEject( "RifleShellEject", shelloffpos, shelloffang ) 
             end )
 
-            return callbackTbl
+            if !scopedIn then
+                scopedBullet.Attacker = self
+                scopedBullet.IgnoreEntity = self
+                scopedBullet.Src = wepent:GetPos()
+                scopedBullet.Dir = ( target:WorldSpaceCenter() - scopedBullet.Src ):GetNormalized()
+                wepent:FireBullets( scopedBullet )
+            end
+
+            return ( scopedIn and callbackTbl or scopedCallbackTbl )
+        end,
+
+        OnThink = function( self, wepent )
+            local ene = self:GetEnemy()
+            local curScoped = wepent.IsScopedIn
+
+            wepent.IsScopedIn = ( LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 512 ) and self:CanSee( ene ) )
+            if wepent.IsScopedIn != curScoped then
+                wepent:EmitSound( "Default.Zoom" )
+            end
+
+            self.l_HoldType = ( wepent.IsScopedIn and "rpg" or "ar2" )
+            self.l_WeaponSpeedMultiplier = ( wepent.IsScopedIn and 0.66 or 1.04 )
+
+            return Rand( 0.25, 0.5 )
         end,
 
         OnReload = function( self, wepent )
-            if self.l_Clip > 2 then return true end
+            if self.l_Clip > 3 then return true end
         end
 	}
 } )
