@@ -43,7 +43,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 2.3, "Weapon_M4A1.Boltpull" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
         	wepent:EmitSound( "Weapon_M4A1.Deploy" )
 	        self:SimpleTimer( 0.4, function() wepent:EmitSound( "Weapon_M4A1.Boltpull" ) end )
 
@@ -51,7 +51,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         	if wepent.IsSilencerOn then wepent:SetModel( "models/weapons/w_rif_m4a1_silencer.mdl" ) end
         end,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
         	if !wepent.IsSilencerOn then return end
         	
         	wepent:EmitSound( "Weapon_M4A1.Silenced" )

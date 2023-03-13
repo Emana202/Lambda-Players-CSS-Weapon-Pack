@@ -30,7 +30,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 		attackrange = 800,
 		clip = 1,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
             local grenade = ents_Create( "prop_physics" )
             if !IsValid( grenade ) then return true end
 

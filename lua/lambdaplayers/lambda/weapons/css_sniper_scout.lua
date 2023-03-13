@@ -44,11 +44,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 2.1, "Weapon_Scout.Bolt" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
             wepent.IsScopedIn = false
         end,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
             local scopedIn = wepent.IsScopedIn
             self.l_WeaponUseCooldown = CurTime() + ( scopedIn and Rand( 2.5, 3.5 ) or Rand( 1.25, 1.66 ) )
 
@@ -68,11 +68,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             return ( scopedIn and callbackTbl or scopedCallbackTbl )
         end,
 
-        OnThink = function( self, wepent )
+        OnThink = function( self, wepent, isdead )
             local ene = self:GetEnemy()
             local curScoped = wepent.IsScopedIn
 
-            wepent.IsScopedIn = ( LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 512 ) and self:CanSee( ene ) )
+            wepent.IsScopedIn = ( !isdead and LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 512 ) and self:CanSee( ene ) )
             if wepent.IsScopedIn != curScoped then
                 wepent:EmitSound( "Default.Zoom" )
             end

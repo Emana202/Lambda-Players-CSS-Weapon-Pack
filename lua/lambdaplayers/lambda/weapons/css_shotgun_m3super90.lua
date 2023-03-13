@@ -26,11 +26,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         attackanim = ACT_HL2MP_GESTURE_RANGE_ATTACK_SHOTGUN,
         attacksnd = "Weapon_M3.Single",
 
-        callback = function( self, wepent )
+        OnAttack = function( self, wepent )
             self:SimpleTimer( 0.5, function() self:HandleShellEject( "ShotgunShellEject", shelloffpos, shelloffang ) end )
         end,
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
             wepent:EmitSound( "Weapon_M3.Pump" )
         end,
 

@@ -31,7 +31,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 3.3, "Weapon_ELITE.Sliderelease" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
             wepent:EmitSound( "Weapon_ELITE.Deploy" )
         end,
 
@@ -41,7 +41,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             local reloadLayer = ( animID != -1 and self:AddGestureSequence( animID ) or self:AddGesture( ACT_HL2MP_GESTURE_RELOAD_DUEL ) )
         end,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
             local muzzleName = "muzzle"
             local shellName = "shell"
             local fireAnim = "range_dual_l"

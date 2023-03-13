@@ -43,14 +43,14 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 2.3, "Weapon_USP.Sliderelease" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
             wepent:EmitSound( "Weapon_USP.Slideback" )
 
             wepent.IsSilencerOn = ( random( 1, 3 ) == 1 )
             if wepent.IsSilencerOn then wepent:SetModel( "models/weapons/w_pist_usp_silencer.mdl" ) end
         end,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
             if !wepent.IsSilencerOn then return end
             
             wepent:EmitSound( "Weapon_USP.SilencedShot" )

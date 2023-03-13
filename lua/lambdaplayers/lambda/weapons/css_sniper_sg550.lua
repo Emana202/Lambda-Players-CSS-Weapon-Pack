@@ -35,7 +35,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 2.9, "Weapon_SG550.Boltpull" }
         },
 
-        callback = function( self, wepent )
+        OnAttack = function( self, wepent )
             self.l_WeaponUseCooldown = CurTime() + Rand( 0.33, 0.5 )
             return callbackTbl
         end,

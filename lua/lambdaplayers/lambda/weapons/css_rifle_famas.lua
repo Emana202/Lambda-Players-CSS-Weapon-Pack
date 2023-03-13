@@ -45,11 +45,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 2.3, "Weapon_FAMAS.Forearm" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
             wepent.IsBurstFireOn = ( random( 1, 4 ) == 1 )
         end,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
             if !wepent.IsBurstFireOn then return end
             if self.l_Clip <= 0 then self:ReloadWeapon() return end
 

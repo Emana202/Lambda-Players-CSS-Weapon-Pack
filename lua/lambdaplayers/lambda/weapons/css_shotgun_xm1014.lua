@@ -28,7 +28,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
         attackanim = ACT_HL2MP_GESTURE_RANGE_ATTACK_SHOTGUN,
         attacksnd = "Weapon_XM1014.Single",
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
             wepent:EmitSound( "Weapon_DEagle.Deploy" )
         end,
 

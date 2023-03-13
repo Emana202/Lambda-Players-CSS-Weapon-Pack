@@ -32,7 +32,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 1.5, "Weapon_AK47.Clipin" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
         	wepent:EmitSound( "Weapon_AK47.BoltPull" )
         end,
 

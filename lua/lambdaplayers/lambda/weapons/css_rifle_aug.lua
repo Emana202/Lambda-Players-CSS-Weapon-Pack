@@ -45,12 +45,12 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 3.3, "Weapon_AUG.Boltslap" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
         	wepent.IsScopedIn = false
             wepent:EmitSound( "Weapon_AUG.Forearm" )
         end,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
             if !wepent.IsScopedIn then return end
 
             self.l_WeaponUseCooldown = CurTime() + 0.135
@@ -64,9 +64,9 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             return callbackTbl
         end,
 
-        OnThink = function( self, wepent )
+        OnThink = function( self, wepent, isdead )
             local ene = self:GetEnemy()
-            wepent.IsScopedIn = ( LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 768 ) and self:CanSee( ene ) )
+            wepent.IsScopedIn = ( !isdead and LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 768 ) and self:CanSee( ene ) )
             
             self.l_HoldType = ( wepent.IsScopedIn and "rpg" or "ar2" )
             self.l_WeaponSpeedMultiplier = ( wepent.IsScopedIn and 0.66 or 0.884 )

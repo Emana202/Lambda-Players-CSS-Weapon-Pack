@@ -45,12 +45,12 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 1.8, "Weapon_Glock.Sliderelease" }
         },
 
-        OnEquip = function( self, wepent )
+        OnDeploy = function( self, wepent )
             wepent:EmitSound( "Weapon_Glock.Sliderelease" )
             wepent.IsBurstFireOn = ( random( 1, 4 ) == 1 )
         end,
 
-        callback = function( self, wepent, target )
+        OnAttack = function( self, wepent, target )
             if !wepent.IsBurstFireOn then return end
             if self.l_Clip <= 0 then self:ReloadWeapon() return end
 
