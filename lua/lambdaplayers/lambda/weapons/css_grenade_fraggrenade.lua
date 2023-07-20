@@ -2,19 +2,11 @@ local IsValid = IsValid
 local CurTime = CurTime
 local random = math.random
 local ents_Create = ents.Create
-local hook_Add = hook.Add
-local hook_Remove = hook.Remove
 local EffectData = EffectData
 local SimpleTimer = timer.Simple
 local util_Effect = util.Effect
 local util_BlastDamage = util.BlastDamage
-
 local angularVel = Vector( 600, 0, 0 )
-local bounceSnds = {
-    [ "physics/metal/weapon_impact_hard1.wav" ] = true,
-    [ "physics/metal/weapon_impact_hard2.wav" ] = true,
-    [ "physics/metal/weapon_impact_hard3.wav" ] = true
-}
 
 table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_grenade_fraggrenade = {
@@ -49,6 +41,10 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             grenade:SetFriction( 0.2 )
             grenade:SetElasticity( 0.45 )
 
+            grenade.l_GrenadeBounceSound = "HEGrenade.Bounce"
+            grenade.l_UseLambdaDmgModifier = true
+            grenade.l_killiconname = wepent.l_killiconname
+
             local phys = grenade:GetPhysicsObject()
             if IsValid( phys ) then
                 phys:ApplyForceCenter( ( target:GetPos() - srcPos ):GetNormalized() * 750 )
@@ -57,32 +53,16 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                 phys:SetAngleVelocity( angularVel )
             end
 
-            local entIndex = grenade:EntIndex()
-            local hookName = "LambdaCSS_HEGrenadeSounds_" .. entIndex
-            hook_Add( "EntityEmitSound", hookName, function( sndData )
-                if IsValid( grenade ) then
-                    local sndPos = sndData.Pos
-                    if sndPos and bounceSnds[ sndData.SoundName ] and grenade:GetPos():DistToSqr( sndPos ) <= ( 128 * 128 ) then 
-                        grenade:EmitSound( "HEGrenade.Bounce" )
-                        return false
-                    end
-                else
-                    hook_Remove( "EntityEmitSound", hookName )
-                end
-            end )
-            grenade:CallOnRemove( "LambdaCSS_OnHEGrenadeRemoved_" .. entIndex, function()
-                hook_Remove( "EntityEmitSound", hookName )
-            end )
-
             SimpleTimer( 1.5, function()
                 if !IsValid( grenade ) then return end
-                
+                local grenPos = grenade:GetPos()
+
                 local effectData = EffectData()
-                effectData:SetOrigin( grenade:GetPos() )
+                effectData:SetOrigin( grenPos )
                 util_Effect( "Explosion", effectData, true, true )
 
                 local owner = grenade:GetOwner()
-                util_BlastDamage( ( IsValid( owner ) and owner:GetWeaponENT() or grenade ), ( IsValid( owner ) and owner or grenade ), grenade:GetPos(), 350, 100 )
+                util_BlastDamage( grenade, ( IsValid( owner ) and owner or grenade ), grenPos, 350, 100 )
 
                 grenade:Remove()
             end )
