@@ -112,6 +112,7 @@ if ( SERVER ) then
 
     if LambdaIsForked then
         hook.Add( "LambdaOnCanSeeEntity", "LambdaCSS_LambdaOnCanSeeEntity", OnLambdaCanSeeEntity )
+        hook.Add( "LambdaOnOtherKilled", "LambdaCSS_LambdaOnOtherKilled", LambdaOnFlashBanged )
     else
         local visibilitytrace = {}
         local Trace = util.TraceLine
@@ -136,7 +137,6 @@ if ( SERVER ) then
         hook.Add( "LambdaOnInitialize", "LambdaCSS_LambdaOnInitialize", OnLambdaOnInitialize )
     end
 
-    hook.Add( "LambdaOnOtherKilled", "LambdaCSS_LambdaOnOtherKilled", LambdaOnFlashBanged )
     hook.Add( "LambdaOnAttackTarget", "LambdaCSS_LambdaOnAttackTarget", LambdaOnFlashBanged )
     hook.Add( "LambdaCanTarget", "LambdaCSS_LambdaOnCanTarget", LambdaOnFlashBanged )
     hook.Add( "EntityEmitSound", "LambdaCSS_OnEntityEmitSound", OnEntityEmitSound )
