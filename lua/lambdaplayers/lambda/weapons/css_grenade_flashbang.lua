@@ -128,7 +128,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                         victim:CancelMovement()
                         victim:SetEnemy( NULL )
                         victim:RetreatFrom( nil, fadeTime )
-                        return
+                        continue
                     end
 
                     flashColor.a = ( ( dotProduct < 0.5 or dotProduct < -0.5 ) and 200 or 255 )
