@@ -2,7 +2,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_machinegun_m249 = {
 		model = "models/weapons/w_mach_m249para.mdl",
 		bonemerge = true,
-		holdtype = "crossbow",
+		holdtype = "shotgun",
 		prettyname = "ES M249 Para",
 		origin = "Counter-Strike: Source",
         killicon = "lambdakillicons_css_machinegun_m249",

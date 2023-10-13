@@ -68,7 +68,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             local ene = self:GetEnemy()
             wepent.IsScopedIn = ( !isdead and LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 768 ) and self:CanSee( ene ) )
             
-            self.l_HoldType = ( wepent.IsScopedIn and "rpg" or "ar2" )
+            self.l_HoldType = ( wepent.IsScopedIn and "rpg" or "smg" )
             self.l_WeaponSpeedMultiplier = ( wepent.IsScopedIn and 0.66 or 0.884 )
 
             return Rand( 0.25, 0.5 )
