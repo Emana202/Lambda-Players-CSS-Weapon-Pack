@@ -56,15 +56,16 @@ if ( SERVER ) then
     local function OnEntityEmitSound( data )
         if grenBounceSnds[ data.SoundName ] then
             local sndPos = data.Pos
+            if sndPos then
+                for _, grenade in ipairs( FindByClass( "prop_physics" ) ) do
+                    if !IsValid( grenade ) then continue end
 
-            for _, grenade in ipairs( FindByClass( "prop_physics" ) ) do
-                if !IsValid( grenade ) then continue end
+                    local bounceSnd = grenade.l_GrenadeBounceSound
+                    if !bounceSnd or grenade:GetPos():DistToSqr( sndPos ) > 16384 then continue end
 
-                local bounceSnd = grenade.l_GrenadeBounceSound
-                if !bounceSnd or grenade:GetPos():DistToSqr( sndPos ) > 16384 then continue end
-
-                grenade:EmitSound( bounceSnd )
-                return false
+                    grenade:EmitSound( bounceSnd )
+                    return false
+                end
             end
         end
     end
