@@ -43,6 +43,9 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 
             grenade.l_GrenadeBounceSound = "HEGrenade.Bounce"
             grenade.l_UseLambdaDmgModifier = true
+
+            grenade.l_Lambdified = true
+            grenade.l_UseLambdaDmgModifier = true
             grenade.l_killiconname = wepent.l_killiconname
 
             local phys = grenade:GetPhysicsObject()
