@@ -3,10 +3,8 @@ local CurTime = CurTime
 local ipairs = ipairs
 local random = math.random
 local ents_Create = ents.Create
-local hook_Add = hook.Add
-local hook_Remove = hook.Remove
-local SimpleTimer = timer.Simple
 local angularVel = Vector( 600, 0, 0 )
+local SimpleTimer = timer.Simple
 
 table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_grenade_smokegrenade = {
@@ -23,7 +21,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 		clip = 1,
 
         OnAttack = function( self, wepent, target )
-            local grenade = ents_Create( "prop_physics" )
+            local grenade = ents_Create( "base_gmodentity" )
             if !IsValid( grenade ) then return true end
 
             local srcPos = wepent:GetPos()
@@ -37,11 +35,15 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             grenade:SetOwner( self )
             grenade:Spawn()
 
+            grenade:PhysicsInit( SOLID_VPHYSICS )
+            grenade:SetMoveCollide( MOVECOLLIDE_FLY_CUSTOM )
+            grenade:AddSolidFlags( FSOLID_NOT_STANDABLE )
+
             grenade:SetGravity( 0.4 )
             grenade:SetFriction( 0.2 )
             grenade:SetElasticity( 0.45 )
 
-            grenade.l_GrenadeBounceSound = "SmokeGrenade.Bounce"
+            grenade.l_BlowTime = ( CurTime() + 1.5 )
 
             local phys = grenade:GetPhysicsObject()
             if IsValid( phys ) then
@@ -51,16 +53,14 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                 phys:SetAngleVelocity( angularVel )
             end
 
-            local smokeParticles = {}
-            local explodeTime = ( CurTime() + 1.5 )
-            local thinkHook = "LambdaCSS_SmokeGrenadeThink_" .. grenade:EntIndex()
+            function grenade:PhysicsCollide( colData, collider )
+                if colData.Speed >= 100 then grenade:EmitSound( "SmokeGrenade.Bounce" ) end
+            end
 
-            hook_Add( "Think", thinkHook, function()
-                if !IsValid( grenade ) then hook_Remove( "Think", thinkHook ) return end
-                if CurTime() < explodeTime then return end
-
+            function grenade:Think()
+                if CurTime() < grenade.l_BlowTime then return end
                 if grenade:GetVelocity():Length() > 0.1 then
-                    explodeTime = ( CurTime() + 0.2 )
+                    grenade.l_BlowTime = ( CurTime() + 0.2 )
                     return
                 end
 
@@ -71,21 +71,13 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                     smokeEnt:SetSaveValue( "m_CurrentStage", 1 )
                     smokeEnt:Spawn()
                     smokeEnt:Activate()
-                    smokeParticles[ #smokeParticles + 1] = smokeEnt
+                    SimpleTimer( 25, function() if IsValid( smokeEnt ) then smokeEnt:Remove() end end )
                 end
+                LambdaCSS_GrenadeSmokes[ grenade ] = { grenPos, ( CurTime() + 20 ) }
 
                 grenade:EmitSound( "BaseSmokeEffect.Sound" )
-                grenade:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
-                LambdaCSS_GrenadeSmokes[ grenade ] = { grenPos, ( CurTime() + 20 ) }
-                if IsValid( phys ) then phys:Sleep() end
-
-                SimpleTimer( 25, function()
-                    if IsValid( grenade ) then grenade:Remove() end
-                    for _, smokeEnt in ipairs( smokeParticles ) do if IsValid( smokeEnt ) then smokeEnt:Remove() end end
-                end )
-
-                hook_Remove( "Think", thinkHook )
-            end )
+                grenade:Remove()
+            end
 
             return true
         end

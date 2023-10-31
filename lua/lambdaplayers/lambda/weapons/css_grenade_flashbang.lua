@@ -26,7 +26,6 @@ end
 local IsValid = IsValid
 local random = math.random
 local ents_Create = ents.Create
-local SimpleTimer = timer.Simple
 local ipairs = ipairs
 local FindInSphere =  ents.FindInSphere
 local ignorePlys = GetConVar( "ai_ignoreplayers" )
@@ -50,7 +49,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 		clip = 1,
 
         OnAttack = function( self, wepent, target )
-            local grenade = ents_Create( "prop_physics" )
+            local grenade = ents_Create( "base_gmodentity" )
             if !IsValid( grenade ) then return true end
 
             local srcPos = wepent:GetPos()
@@ -64,11 +63,15 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             grenade:SetOwner( self )
             grenade:Spawn()
 
+            grenade:PhysicsInit( SOLID_VPHYSICS )
+            grenade:SetMoveCollide( MOVECOLLIDE_FLY_CUSTOM )
+            grenade:AddSolidFlags( FSOLID_NOT_STANDABLE )
+
             grenade:SetGravity( 0.4 )
             grenade:SetFriction( 0.2 )
             grenade:SetElasticity( 0.45 )
 
-            grenade.l_GrenadeBounceSound = "Flashbang.Bounce"
+            grenade.l_BlowTime = ( CurTime() + 1.5 )
 
             local phys = grenade:GetPhysicsObject()
             if IsValid( phys ) then
@@ -78,65 +81,69 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                 phys:SetAngleVelocity( angularVel )
             end
 
-            SimpleTimer( 1.5, function()
-                if !IsValid( grenade ) then return end
-                
+            function grenade:PhysicsCollide( colData, collider )
+                if colData.Speed >= 100 then grenade:EmitSound( "Flashbang.Bounce" ) end
+            end
+
+            function grenade:Think()
+                if CurTime() < grenade.l_BlowTime then return end
+
                 local owner = grenade:GetOwner()
-                if !IsValid( owner ) then return end
-
                 local grenPos = grenade:GetPos()
-                for _, victim in ipairs( FindInSphere( grenPos, 1500 ) ) do
-                    if victim == owner and ignoreThrower:GetBool() or !IsValid( victim ) or !victim.IsLambdaPlayer and !victim:IsPlayer() or !owner:CanTarget( victim ) or !victim:VisibleVec( grenPos ) then continue end
-                    local eyePos = ( victim.IsLambdaPlayer and victim:GetAttachmentPoint( "eyes" ).Pos or victim:EyePos() )                            
+                if IsValid( owner ) then
+                    for _, victim in ipairs( FindInSphere( grenPos, 1500 ) ) do
+                        if victim == owner and ignoreThrower:GetBool() or !IsValid( victim ) or !victim.IsLambdaPlayer and !victim:IsPlayer() or !owner:CanTarget( victim ) or !victim:VisibleVec( grenPos ) then continue end
+                        local eyePos = ( victim.IsLambdaPlayer and victim:GetAttachmentPoint( "eyes" ).Pos or victim:EyePos() )                            
 
-                    local adjDmg = ( 4 - ( eyePos:Distance( grenPos ) * 0.0026666666666667 ) )
-                    if adjDmg <= 0 then continue end
+                        local adjDmg = ( 4 - ( eyePos:Distance( grenPos ) * 0.0026666666666667 ) )
+                        if adjDmg <= 0 then continue end
 
-                    local lookDir = ( victim.IsLambdaPlayer and victim:GetForward() or victim:GetAimVector() )
-                    local los = ( grenPos - eyePos )
+                        local lookDir = ( victim.IsLambdaPlayer and victim:GetForward() or victim:GetAimVector() )
+                        local los = ( grenPos - eyePos )
 
-                    local dotProduct = lookDir:Dot( los:GetNormalized() )
-                    local fadeTime, fadeHold = adjDmg, ( adjDmg * 0.25 )
-                    if dotProduct >= 0.5 then
-                        fadeTime = ( adjDmg * 2.5 )
-                        fadeHold = ( adjDmg * 1.25 )
-                    elseif dotProduct >= -0.5 then
-                        fadeTime = ( adjDmg * 1.75 )
-                        fadeHold = ( adjDmg * 0.8 )
-                    end
-                    fadeTime = ( fadeTime * 0.4 )
-                    fadeHold = ( fadeHold * 0.4 )
+                        local dotProduct = lookDir:Dot( los:GetNormalized() )
+                        local fadeTime, fadeHold = adjDmg, ( adjDmg * 0.25 )
+                        if dotProduct >= 0.5 then
+                            fadeTime = ( adjDmg * 2.5 )
+                            fadeHold = ( adjDmg * 1.25 )
+                        elseif dotProduct >= -0.5 then
+                            fadeTime = ( adjDmg * 1.75 )
+                            fadeHold = ( adjDmg * 0.8 )
+                        end
+                        fadeTime = ( fadeTime * 0.4 )
+                        fadeHold = ( fadeHold * 0.4 )
 
-                    if victim.IsLambdaPlayer then
-                        fadeTime = ( fadeTime * 1.75 )
-                        if fadeTime < 1 then continue end
+                        if victim.IsLambdaPlayer then
+                            fadeTime = ( fadeTime * 1.75 )
+                            if fadeTime < 1 then continue end
 
-                        victim.l_BlindedByFlashbang = true
-                        victim:AddGesture( ACT_HL2MP_FIST_BLOCK, false )
+                            victim.l_BlindedByFlashbang = true
+                            victim:AddGesture( ACT_HL2MP_FIST_BLOCK, false )
 
-                        victim:SimpleTimer( fadeTime, function() 
-                            victim:RemoveGesture( ACT_HL2MP_FIST_BLOCK )
-                            victim.l_BlindedByFlashbang = false
+                            victim:SimpleTimer( fadeTime, function() 
+                                victim:RemoveGesture( ACT_HL2MP_FIST_BLOCK )
+                                victim.l_BlindedByFlashbang = false
 
-                            if !victim:Alive() or !victim:IsPanicking() then return end
+                                if !victim:Alive() or !victim:IsPanicking() then return end
+                                victim:CancelMovement()
+
+                                if owner == victim or !LambdaIsValid( owner ) then return end
+                                victim:AttackTarget( owner, true )
+                            end, true )
+
                             victim:CancelMovement()
+                            victim:SetEnemy( NULL )
+                            victim:RetreatFrom( nil, fadeTime )
+                            continue
+                        end
 
-                            if owner == victim or !LambdaIsValid( owner ) then return end
-                            victim:AttackTarget( owner, true )
-                        end, true )
+                        flashColor.a = ( ( dotProduct < 0.5 or dotProduct < -0.5 ) and 200 or 255 )
+                        victim:ScreenFade( SCREENFADE.IN, flashColor, fadeTime, fadeHold )
 
-                        victim:CancelMovement()
-                        victim:SetEnemy( NULL )
-                        victim:RetreatFrom( nil, fadeTime )
-                        continue
+                        local dist = los:Length()
+                        local strength = ( dist < 600 and 35 or ( dist < 800 and 36 or ( dist < 1000 and 37 ) ) )
+                        if strength then victim:SetDSP( strength, false ) end
                     end
-
-                    flashColor.a = ( ( dotProduct < 0.5 or dotProduct < -0.5 ) and 200 or 255 )
-                    victim:ScreenFade( SCREENFADE.IN, flashColor, fadeTime, fadeHold )
-
-                    local dist = los:Length()
-                    local strength = ( dist < 600 and 35 or ( dist < 800 and 36 or ( dist < 1000 and 37 ) ) )
-                    if strength then victim:SetDSP( strength, false ) end
                 end
 
                 net.Start( "lambdacss_flashbangexplode" )
@@ -146,7 +153,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 
                 grenade:EmitSound( "Flashbang.Explode" )
                 grenade:Remove()
-            end )
+            end
 
             return true
         end

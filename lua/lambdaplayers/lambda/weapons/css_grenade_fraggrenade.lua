@@ -3,7 +3,6 @@ local CurTime = CurTime
 local random = math.random
 local ents_Create = ents.Create
 local EffectData = EffectData
-local SimpleTimer = timer.Simple
 local util_Effect = util.Effect
 local util_BlastDamage = util.BlastDamage
 local angularVel = Vector( 600, 0, 0 )
@@ -23,11 +22,11 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 		clip = 1,
 
         OnAttack = function( self, wepent, target )
-            local grenade = ents_Create( "prop_physics" )
+            local grenade = ents_Create( "base_gmodentity" )
             if !IsValid( grenade ) then return true end
 
             local srcPos = wepent:GetPos()
-            self.l_WeaponUseCooldown = CurTime() + random( 2.0, 3.0 )
+            self.l_WeaponUseCooldown = CurTime() + random( 2, 3 )
 
             self:RemoveGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_GRENADE )
             self:AddGesture( ACT_HL2MP_GESTURE_RANGE_ATTACK_GRENADE, true )
@@ -37,16 +36,17 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             grenade:SetOwner( self )
             grenade:Spawn()
 
+            grenade:PhysicsInit( SOLID_VPHYSICS )
+            grenade:SetMoveCollide( MOVECOLLIDE_FLY_CUSTOM )
+            grenade:AddSolidFlags( FSOLID_NOT_STANDABLE )
+
             grenade:SetGravity( 0.4 )
             grenade:SetFriction( 0.2 )
             grenade:SetElasticity( 0.45 )
 
-            grenade.l_GrenadeBounceSound = "HEGrenade.Bounce"
-            grenade.l_UseLambdaDmgModifier = true
-
-            grenade.l_Lambdified = true
             grenade.l_UseLambdaDmgModifier = true
             grenade.l_killiconname = wepent.l_killiconname
+            grenade.l_BlowTime = ( CurTime() + 1.5 )
 
             local phys = grenade:GetPhysicsObject()
             if IsValid( phys ) then
@@ -56,8 +56,12 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
                 phys:SetAngleVelocity( angularVel )
             end
 
-            SimpleTimer( 1.5, function()
-                if !IsValid( grenade ) then return end
+            function grenade:PhysicsCollide( colData, collider )
+                if colData.Speed >= 100 then grenade:EmitSound( "HEGrenade.Bounce" ) end
+            end
+
+            function grenade:Think()
+                if CurTime() < grenade.l_BlowTime then return end
                 local grenPos = grenade:GetPos()
 
                 local effectData = EffectData()
@@ -66,9 +70,9 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 
                 local owner = grenade:GetOwner()
                 util_BlastDamage( grenade, ( IsValid( owner ) and owner or grenade ), grenPos, 350, 100 )
-
+                
                 grenade:Remove()
-            end )
+            end
 
             return true
         end

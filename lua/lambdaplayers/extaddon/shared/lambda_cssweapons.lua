@@ -45,30 +45,7 @@ if ( SERVER ) then
     local CurTime = CurTime
     local FindByClass = ents.FindByClass
     
-    local grenBounceSnds = {
-        [ "physics/metal/weapon_impact_hard1.wav" ] = true,
-        [ "physics/metal/weapon_impact_hard2.wav" ] = true,
-        [ "physics/metal/weapon_impact_hard3.wav" ] = true
-    }
-
     LambdaCSS_GrenadeSmokes = LambdaCSS_GrenadeSmokes or {}
-
-    local function OnEntityEmitSound( data )
-        if grenBounceSnds[ data.SoundName ] then
-            local sndPos = data.Pos
-            if sndPos then
-                for _, grenade in ipairs( FindByClass( "prop_physics" ) ) do
-                    if !IsValid( grenade ) then continue end
-
-                    local bounceSnd = grenade.l_GrenadeBounceSound
-                    if !bounceSnd or grenade:GetPos():DistToSqr( sndPos ) > 16384 then continue end
-
-                    grenade:EmitSound( bounceSnd )
-                    return false
-                end
-            end
-        end
-    end
 
     local function LambdaOnFlashBanged( lambda )
         if lambda.l_BlindedByFlashbang then return true end
@@ -94,7 +71,7 @@ if ( SERVER ) then
     local function OnLambdaCanSeeEntity( lambda, ent, tr )
         if lambda.l_BlindedByFlashbang then return true end
 
-        if #LambdaCSS_GrenadeSmokes > 0 and !lambda:IsInRange( tr.HitPos, 96 ) then
+        if !lambda:IsInRange( tr.HitPos, 128 ) then
             local totalSmokedLength = 0
             for grenade, data in pairs( LambdaCSS_GrenadeSmokes ) do
                 if !IsValid( grenade ) or CurTime() >= data[ 2 ] then
@@ -140,5 +117,4 @@ if ( SERVER ) then
 
     hook.Add( "LambdaOnAttackTarget", "LambdaCSS_LambdaOnAttackTarget", LambdaOnFlashBanged )
     hook.Add( "LambdaCanTarget", "LambdaCSS_LambdaOnCanTarget", LambdaOnFlashBanged )
-    hook.Add( "EntityEmitSound", "LambdaCSS_OnEntityEmitSound", OnEntityEmitSound )
 end

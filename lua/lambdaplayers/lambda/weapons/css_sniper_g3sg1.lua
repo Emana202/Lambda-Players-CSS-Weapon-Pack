@@ -1,6 +1,15 @@
 local callbackTbl = { cooldown = true }
 local Rand = math.Rand
 
+local scopedCallbackTbl = { damage = true, cooldown = true }
+local scopedBullet = {
+    Damage = 45,
+    Force = 45,
+    Spread = Vector( 0.3, 0.3, 0 ),
+    TracerName = "Tracer",
+    HullSize = 5
+}
+
 table.Merge( _LAMBDAPLAYERSWEAPONS, {
 	css_sniper_g3sg1 = {
 		model = "models/weapons/w_snip_g3sg1.mdl",
@@ -17,7 +26,7 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
 
 		clip = 20,
         damage = 45,
-        spread = 0.1,
+        spread = 0.066,
         tracername = "Tracer",
         muzzleflash = 1,
         shelleject = "RifleShellEject",
@@ -36,9 +45,34 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             { 3.9, "Weapon_G3SG1.Slide" }
         },
 
-        OnAttack = function( self, wepent )
-            self.l_WeaponUseCooldown = CurTime() + Rand( 0.33, 0.5 )
-            return callbackTbl
+        OnAttack = function( self, wepent, target )
+            local scopedIn = wepent.IsScopedIn
+            self.l_WeaponUseCooldown = CurTime() + ( scopedIn and Rand( 0.75, 1.2 ) or Rand( 0.4, 0.6 ) )
+
+            if !scopedIn then
+                scopedBullet.Attacker = self
+                scopedBullet.IgnoreEntity = self
+                scopedBullet.Src = wepent:GetPos()
+                scopedBullet.Dir = ( target:WorldSpaceCenter() - scopedBullet.Src ):GetNormalized()
+                wepent:FireBullets( scopedBullet )
+            end
+
+            return ( scopedIn and callbackTbl or scopedCallbackTbl )
+        end,
+
+        OnThink = function( self, wepent, isdead )
+            local ene = self:GetEnemy()
+            local curScoped = wepent.IsScopedIn
+
+            wepent.IsScopedIn = ( !isdead and LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 400 ) and self:CanSee( ene ) )
+            if wepent.IsScopedIn != curScoped then
+                wepent:EmitSound( "Default.Zoom" )
+            end
+
+            self.l_HoldType = ( wepent.IsScopedIn and "sniperrifle" or "ar2" )
+            self.l_WeaponSpeedMultiplier = ( wepent.IsScopedIn and 0.55 or 0.84 )
+
+            return Rand( 0.1, 0.33 )
         end,
 
         OnReload = function( self, wepent )

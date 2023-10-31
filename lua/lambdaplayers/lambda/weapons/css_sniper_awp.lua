@@ -76,15 +76,15 @@ table.Merge( _LAMBDAPLAYERSWEAPONS, {
             local ene = self:GetEnemy()
             local curScoped = wepent.IsScopedIn
 
-            wepent.IsScopedIn = ( !isdead and LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 512 ) and self:CanSee( ene ) )
+            wepent.IsScopedIn = ( !isdead and LambdaIsValid( ene ) and self:GetState() == "Combat" and !self:IsInRange( ene, 400 ) and self:CanSee( ene ) )
             if wepent.IsScopedIn != curScoped then
                 wepent:EmitSound( "Default.Zoom" )
             end
 
-            self.l_HoldType = ( wepent.IsScopedIn and "rpg" or "ar2" )
+            self.l_HoldType = ( wepent.IsScopedIn and "sniperrifle" or "ar2" )
             self.l_WeaponSpeedMultiplier = ( wepent.IsScopedIn and 0.55 or 0.84 )
 
-            return Rand( 0.25, 0.5 )
+            return Rand( 0.1, 0.33 )
         end,
 
         OnReload = function( self, wepent )
